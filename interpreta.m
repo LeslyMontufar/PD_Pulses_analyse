@@ -1,13 +1,13 @@
 clc 
-clear variables
+clear variables -except Z
 close all
 
-% SNR = 'GERAL';
-cnt = 1;
-for SNR = [-2,-4,-7,-10,-13]
-if isnumeric(SNR)
+bests = [];
+for SNR = [22,0,-2,-4,-7,-10,-13]
+if isnumeric(SNR) & SNR~=22
     fname = ['SNR' num2str(SNR) '.mat'];
 else
+    SNR = 'GERAL';
     fname = [SNR '.mat'];
 end
 load(fname)
@@ -29,7 +29,7 @@ for i = 1:LX
     x = X(i);
     p = t(t.(1) == x,:);
     best{linha,coluna} = x;
-    best{linha+1,coluna} = ' ';
+    best{linha+1,coluna} = x;
     if PLOT
     fh = figure();
     fh.WindowState = 'maximized';
@@ -62,6 +62,7 @@ for i = 1:LX
         coluna = coluna + 1;
     end
     best{linha,coluna} = Z.ResFinal{(i-1)*10+1,3};
+%     best{linha,coluna} = findNCC(linha,best);
     best{linha+1,coluna} = ' ';
     coluna = coluna + 1;
     n_max = ceil(log2(Z.ResFinal{(i-1)*10+1,2}));
@@ -70,7 +71,7 @@ for i = 1:LX
     best{linha+1,coluna} = floor((n_max-n_)/n_max*100);
     coluna = coluna + 1;
     best{linha,coluna} = ' ';
-    best{linha+1,coluna} = mean(cell2mat(best(linha+1,3:coluna-3)));
+    best{linha+1,coluna} = mean([mean(cell2mat(best(linha+1,3:coluna-3))),best{linha,coluna-2}*100]);
     
     if PLOT
     if isnumeric(SNR)
@@ -82,10 +83,11 @@ for i = 1:LX
     end
     linha = linha + 2;
 end
-bests{cnt} = best;
-cnt = cnt + 1;
+if SNR == 22; bests = best; else bests = [bests; best]; end
+
 end
-   
+bests = sortrows(bests,[1]);
+
 function plotPulsos
     figure;
     for i=1:25
@@ -93,4 +95,8 @@ function plotPulsos
         plot(Z.ResFinal{(i-1)*10+1,2});
     end
 end
+
+
+    
+
 
