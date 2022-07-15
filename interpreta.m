@@ -76,7 +76,9 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
             por{k} = floor(vm/sum(GC)*100);
             
             porcentagens = sort(floor(GC/sum(GC)*100),'descend');
-            best{linha+1,coluna} = [GR(GC>mean(GC)); porcentagens(GC>mean(GC))];
+            if isnumeric(GR(1)); labels = string(GR(GC>=mean(GC))); else; labels = GR(GC>=mean(GC)); end
+            best{linha+1,coluna} = [string(por(k)) join(labels,', ')];%[porcentagens; mean(porcentagens)];
+            
             coluna = coluna + 1;
         end
 
