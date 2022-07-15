@@ -3,6 +3,8 @@ clear variables %-except Z tab
 close all
 load('base_dados_para_NCC'); % var: tab
 
+variables=4:13;
+N = length(variables);
 names = {'Combined Information','modoExt','mThresR','mThresC','estRuidoR','estRuidoC','thresR','thresC','n','2J'};
 
 PLOT = 0;
@@ -11,6 +13,7 @@ cnt = 1;
 bests = [];
 if COMP; cadaSNR = []; end
 if ~COMP; resumo_por = []; end
+poss = cell(1,N);
 
 for SNR = [22,0,-2,-4,-7,-10,-13]
     if isnumeric(SNR) && SNR~=22
@@ -23,8 +26,6 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
     Z.ResFinal(:,2) = num2cell(cellfun('length',Z.ResFinal(:,2)));
     Z.ResFinal(:,13) = [];
     t = cell2table(Z.ResFinal);
-    variables=4:13;
-    N = length(variables);
     X = unique(t.(1));
     LX = length(X);
     best = cell(LX,N+1);
@@ -36,48 +37,48 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
         coluna = 1;
         x = X(i);
         p = t(t.(1) == x,:);
+        
         best{linha,coluna} = x;
-
         if COMP
             best{linha+1,coluna} = x;
         end
 
-        if PLOT
-            fh = figure();
-            fh.WindowState = 'maximized';
-            u = ceil(sqrt(N));
-            n = floor(N/u)+1;
-        end
-
         coluna = 2;
-        best{linha,coluna} = Z.ResFinal{(i-1)*10+1,2};
+        best{linha,coluna} = Z.ResFinal{(i-1)*10+1,2}; % tamanho do pulso
         if COMP
             best{linha+1,coluna} = ' ';
         end
         coluna = coluna + 1;
+        
         for k = 1:N
             colData = p.(variables(k));
-            [xx0,GR] = findgroups(colData);
-            [GC,~] = histc(xx0,unique(xx0));
-
-            if PLOT
-                subplot(u,n,k)
-                bar(GC,'BarWidth', 0.2);
-                set(gca,'xtick',[1:length(GR)],'xticklabel',GR)
-                title(names{k})
-            end
+            [GC,GR]=groupcounts(colData);
             
-            [~,I] = sort(GC,'descend');
+            [GC,I] = sort(GC,'descend');
             GR = GR(I);
-%             [vm,m] = max(GC);
             vm = GC(1);
             best{linha,coluna} = GR(1);
-
-            por{k} = floor(vm/sum(GC)*100);
             
-            porcentagens = sort(floor(GC/sum(GC)*100),'descend');
-            if isnumeric(GR(1)); labels = string(GR(GC>=mean(GC))); else; labels = GR(GC>=mean(GC)); end
-            best{linha+1,coluna} = [string(por(k)) join(labels,', ')];%[porcentagens; mean(porcentagens)];
+            porcentagens = floor(GC/sum(GC)*100);
+            por{k} = porcentagens(1);
+            
+            if COMP
+                if sum(GC>=mean(GC))==1
+                    if por{k}>70
+                        labels = "";
+                    else
+                        labels = [por{k}; mean(porcentagens)];
+                    end    
+                else
+                    labels = [GR(GC>=mean(GC)); porcentagens(GC>=mean(GC)); mean(porcentagens)];
+                end
+                if sum(GC>=mean(GC))==2 && porcentagens(1)>70
+                    labels = "";
+                end
+
+                if isnumeric(labels(1)); labels = string(labels); end
+                best{linha+1,coluna} = join(labels,', ');
+            end
             
             coluna = coluna + 1;
         end
@@ -102,14 +103,6 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
         else
             best{linha,coluna} = (mean(cell2mat(por)) + best{linha,coluna-2}*100)/2;
         end
-
-        if PLOT
-            if isnumeric(SNR)
-                suptitle(['Parâmetros dos filtros para o pulso ' num2str(i) ' e SNR = ' num2str(SNR) ' dB'])
-            else
-                suptitle(['Parâmetros dos filtros para o pulso ' num2str(i)])
-            end
-        end
         linha = linha + 1 + COMP;
     end
     
@@ -132,7 +125,7 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
 end
 bests = sortrows(bests,[1]);
 
-
-    
-
-
+function [GC,GR]=groupcounts(colData)
+    [xx0,GR] = findgroups(colData);
+    [GC,~] = histc(xx0,unique(xx0));
+end
