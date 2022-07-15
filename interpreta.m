@@ -6,7 +6,7 @@ load('base_dados_para_NCC'); % var: tab
 names = {'Combined Information','modoExt','mThresR','mThresC','estRuidoR','estRuidoC','thresR','thresC','n','2J'};
 
 PLOT = 0;
-COMP = 0; %completo
+COMP = 1; %completo
 cnt = 1;
 bests = [];
 if COMP; cadaSNR = []; end
@@ -39,7 +39,7 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
         best{linha,coluna} = x;
 
         if COMP
-            best{linha+1,coluna} = x;%' ';%x; 
+            best{linha+1,coluna} = x;
         end
 
         if PLOT
@@ -66,15 +66,17 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
                 set(gca,'xtick',[1:length(GR)],'xticklabel',GR)
                 title(names{k})
             end
+            
+            [~,I] = sort(GC,'descend');
+            GR = GR(I);
+%             [vm,m] = max(GC);
+            vm = GC(1);
+            best{linha,coluna} = GR(1);
 
-            [vm,m] = max(GC);
-            best{linha,coluna} = GR(m);
-
-            if COMP
-                best{linha+1,coluna} = floor(vm/sum(GC)*100); 
-            else
-                por{k} = floor(vm/sum(GC)*100);
-            end
+            por{k} = floor(vm/sum(GC)*100);
+            
+            porcentagens = sort(floor(GC/sum(GC)*100),'descend');
+            best{linha+1,coluna} = [GR(GC>mean(GC)); porcentagens(GC>mean(GC))];
             coluna = coluna + 1;
         end
 
@@ -94,7 +96,7 @@ for SNR = [22,0,-2,-4,-7,-10,-13]
         coluna = coluna + 1;
         if COMP
             best{linha,coluna} = ' ';
-            best{linha+1,coluna} = mean([mean(cell2mat(best(linha+1,3:coluna-3))),best{linha,coluna-2}*100]);
+            best{linha+1,coluna} = (mean(cell2mat(por)) + best{linha,coluna-2}*100)/2;
         else
             best{linha,coluna} = (mean(cell2mat(por)) + best{linha,coluna-2}*100)/2;
         end
