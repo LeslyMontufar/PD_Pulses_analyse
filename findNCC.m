@@ -1,10 +1,10 @@
 function ncc = findNCC(filtro,best,tab,pulso)   
     ix = 1;
     yinit = 1;
-    for coluna = 3:12
+    for coluna = 1:10
        iy = 1;
        for linha = yinit:240*pulso
-           if tab{linha,coluna}==best{filtro,coluna}
+           if tab{linha,coluna+2}==best{filtro,coluna}
                ids(iy,ix) = linha;
                iy=iy+1;
            end
