@@ -1,5 +1,5 @@
 clc;
-clearvars -except best_pulso;
+clearvars %-except best_pulso;
 close all;
 load('base_dados_para_NCC'); % var: tab
 names = {'Combined Information','modoExt','mThresR','mThresC','estRuidoR','estRuidoC','thresR','thresC','n','2J'};
@@ -8,7 +8,7 @@ if ~exist('best_pulso','var')
     variables=4:13;
     N = length(variables);
     PLOT = 0;
-    COMP = 1; %completo
+    COMP = 0; %completo
     cnt = 1;
     bests = [];
     if COMP; cadaSNR = []; end
@@ -112,7 +112,8 @@ if ~exist('best_pulso','var')
             coluna = coluna + 1;
             n_max = ceil(log2(Z.ResFinal{(i-1)*10+1,2}));
             n_ = Z.ResFinal{(i-1)*10+1,12};
-            best{linha,coluna} = n_max-n_;
+            best{linha,11} = n_max-n_;
+            best{linha,coluna} = n_;
             if COMP
                 best{linha+1,coluna} = floor((n_max-n_)/n_max*100); 
             end
@@ -155,7 +156,8 @@ if ~exist('best_pulso','var')
             best_pulso{i,k} = GR(1);
         end
         best_pulso{i,k+1} = findNCC(1,best_pulso(i,3:12),tab,i);
-        best_pulso{i,k+2} = ceil(log2(best_pulso{i,2})) - best_pulso{i,k-1};
+        best_pulso{i,k+2} = best_pulso{i,k-1};
+        best_pulso{i,k-1} = ceil(log2(best_pulso{i,2})) - best_pulso{i,k-1};
     end
 end
     best_pulso{26,1} = "Melhor";
@@ -164,14 +166,10 @@ end
         colData = t.(k);
         [GC,GR] = groupcounts(colData);
         best_pulso{26,k} = GR(1);
-%         if k==12 %2J
-%             GR
-%             GC
-%         end
     end
-    best_pulso{26,13} = findNCC(1,best_pulso(26,3:12),tab,0);
-% end
-% hist_parametros(best_pulso,names);
+    
+    % Não pode determinar o ncc sem o n, que não se sabe sem o tamanho do
+    % pulso
 
 function [GC,GR] = groupcounts(colData)
     [xx0,GR] = findgroups(colData);  % GROUP
