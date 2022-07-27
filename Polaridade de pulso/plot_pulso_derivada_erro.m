@@ -1,8 +1,8 @@
-function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,sub)
+function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,sub,mostrar_derivada)
     myiPeak_ = abs(myiPeak(i));
     
     pulso = pulsos(i,:);
-    pulso = resample(pulso,100,1);
+    pulso = resample(pulso,r,1);
     n = 1:size(pulso,2);
     
     % Média móvel
@@ -16,7 +16,7 @@ function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,sub)
     myiPeak_ = s(1)/abs(s(1)) * myiPeak_;
     
     % Gráfico
-    if sub ~= 0
+    if sub == 0
         fh = figure;
         fh.WindowState = 'maximized';
     end
@@ -26,13 +26,14 @@ function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,sub)
     line ([size(pulso,2) 0], [iPeak(i,1) iPeak(i,1)], "linestyle", "-", "color", "g"); 
     scatter(n,s,'r','filled');
     
-    yyaxis right
-    plot(derivada);
-    
+    if mostrar_derivada
+        yyaxis right
+        plot(derivada);
+    end
     v_err = abs((myiPeak_-iPeak(i,1))/iPeak(i,1)*100);
-    title([myiPeak_,iPeak(i,1), v_err]);
+    title([i,myiPeak_,iPeak(i,1), v_err]);
     xlim([0 size(pulso,2)]);
-    if sub ~= "~"
+    if sub == 0
         legend("original","mm","derivada");
     end
 end

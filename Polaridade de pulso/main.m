@@ -17,47 +17,45 @@ coincidiram = size(pulsos,1)-cnt;
 
 % pulso com uma oscilação gigante no final
 i = 4158;
-% plot_pulso_erro(4158,pulsos,iPeak);
-% plot_pulso_erro(550,pulsos,iPeak);
 myiPeak(i) = max(abs(pulsos(i,1:end-5)));
 if myiPeak(i)-abs(iPeak(i))<= err_per/100*abs(iPeak(i))
     coincidiram = coincidiram + 1;
-    fprintf("%d: %d %d",i,myiPeak(i),abs(iPeak(i)))
-    fprintf(" -> sucesso\n");
+%     fprintf("%d: %d %d",i,myiPeak(i),abs(iPeak(i)))
+%     fprintf(" -> sucesso\n");
+else
+    return
 end
 
 % ---- Determinando se a primeira oscilação é um mínimo ou máximo local ----
 % plot_pulso_derivada_erro(2,pulsos,myiPeak,iPeak);
 
+% Dado: 0.0045 é o passo em y, é erro mínimo do equipamento
+% Tem mais erros qnd iPeak ~ 0.25, logo qnd o erro é 1.8% do pico de
+% corrente.
 
 % Gerando resultado final
-r = 100;
-kk = 8;
+r = 30;
+kk = .8;
 pp = 15;
-x = 1;
+k = floor(kk/100*size(pulsos,2)*r);
+derivada = zeros(1,size(pulsos,2)*r);
 for i=1:size(pulsos,1)
-    while 1
-        pulso = pulsos(i,(x-1)*250+1:250*x);
-        if max(abs(pulso))<=5*pp/100*myiPeak(i)
-            x = x + 1;
-        else
-            break;
-        end
-    end
+    pulso = pulsos(i,:);
     pulso = resample(pulso,r,1);
     n = 1:size(pulso,2);
     
     % Média móvel
-    k = kk/100*size(pulso,2);
     pulso_mm = conv(pulso,ones(1,k)/k,'same');
-    derivada = diff(pulso_mm);
-    derivada = [0 derivada];
+    derivada(2:end) = diff(pulso_mm);
+
     condicao = ((abs(derivada)<=1/100*max(abs(derivada))) & (abs(pulso_mm)>=pp/100*myiPeak(i))); 
     s = pulso_mm(condicao);
     myiPeak(i) = s(1)/abs(s(1)) * myiPeak(i);
+    if iPeak(i)/abs(iPeak(i)) ~= myiPeak(i)/abs(myiPeak(i))
+        ss(end+1) = s(1);
+    end
 end
-save("myiPeak")
-[v,naocoincidem,i_erros] = log_v(myiPeak,iPeak);
+[v,naocoincidem,i_erros] = log_v(myiPeak,iPeak,ss);
 
 % Para testar
 % close all;
@@ -66,9 +64,9 @@ fh.WindowState = 'maximized';
 for sub=1:9
     i=i_erros(sub);
     subplot(3,3,sub);
-    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,"~");
+    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,1,0);
 %     plot_pulso_erro(i,pulsos,iPeak,"~");
 end 
-plot_pulso_erro(550,pulsos,iPeak,1);
-plot_pulso_erro(286,pulsos,iPeak,1);
-plot_pulso_derivada_erro(286,pulsos,myiPeak,iPeak,2,pp,1);
+% plot_pulso_erro(550,pulsos,iPeak,0);
+% plot_pulso_erro(286,pulsos,iPeak,0);
+% plot_pulso_derivada_erro(552,pulsos,myiPeak,iPeak,kk,pp,0);
