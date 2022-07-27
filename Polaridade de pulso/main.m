@@ -26,50 +26,14 @@ if myiPeak(i)-abs(iPeak(i))<= err_per/100*abs(iPeak(i))
 end
 
 % ---- Determinando se a primeira oscilação é um mínimo ou máximo local ----
+% plot_pulso_derivada_erro(2,pulsos,myiPeak,iPeak);
 
-if 0
-x = 2;
-row = 1;
-fh = figure;
-fh.WindowState = 'maximized';
-for i=row^2*(x-1)+1:row^2*x%size(pulsos,1)
-    if row>1; subplot(row,row,i-row^2*(x-1)); end
-    pulso = pulsos(i,1:250);
-    pulso = resample(pulso,100,1);
-    n = 1:size(pulso,2);
-    
-    % Média móvel
-    k = 8/100*size(pulso,2);
-    pulso_mm = conv(pulso,ones(1,k)/k,'same');
-    derivada = diff(pulso_mm);
-    derivada = [0 derivada];
-    condicao = ((abs(derivada)<=1/100*max(abs(derivada))) & (abs(pulso_mm)>=20/100*max(abs(pulso_mm)))); 
-    s = pulso_mm(condicao);
-    n = n(condicao);
-    myiPeak(i) = s(1)/abs(s(1)) * myiPeak(i);
-    
-    % Gráfico
-    plot(pulso);
-    hold on;
-    plot(pulso_mm);
-    line ([size(pulso,2) 0], [iPeak(i,1) iPeak(i,1)], "linestyle", "-", "color", "g"); 
-    scatter(n,s,'r','filled');
-    
-    yyaxis right
-    plot(derivada);
-    
-    v_err = abs((myiPeak(i,1)-iPeak(i,1))/iPeak(i,1)*100);
-    title([myiPeak(i,1),iPeak(i,1), v_err*(v_err>50)]);
-    xlim([0 2e4]);
-    legend("original","mm","derivada");
-end
-end
 
 % Gerando resultado final
-
+r = 100;
 for i=1:size(pulsos,1)
     pulso = pulsos(i,1:250);
-    pulso = resample(pulso,100,1);
+    pulso = resample(pulso,r,1);
     n = 1:size(pulso,2);
     
     % Média móvel
@@ -81,4 +45,15 @@ for i=1:size(pulsos,1)
     s = pulso_mm(condicao);
     myiPeak(i) = s(1)/abs(s(1)) * myiPeak(i);
 end
-[v,naocoincidem] = log_v(myiPeak,iPeak);
+save("myiPeak")
+[v,naocoincidem,i_erros] = log_v(myiPeak,iPeak);
+
+% Para testar
+close all;
+fh = figure;
+fh.WindowState = 'maximized';
+for sub=1:9
+    i=i_erros(sub);
+    subplot(3,3,sub);
+    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,5,15,"~");
+end 
