@@ -18,6 +18,7 @@ coincidiram = size(pulsos,1)-cnt;
 % pulso com uma oscilação gigante no final
 i = 4158;
 % plot_pulso_erro(4158,pulsos,iPeak);
+% plot_pulso_erro(550,pulsos,iPeak);
 myiPeak(i) = max(abs(pulsos(i,1:end-5)));
 if myiPeak(i)-abs(iPeak(i))<= err_per/100*abs(iPeak(i))
     coincidiram = coincidiram + 1;
@@ -31,17 +32,27 @@ end
 
 % Gerando resultado final
 r = 100;
+kk = 8;
+pp = 15;
+x = 1;
 for i=1:size(pulsos,1)
-    pulso = pulsos(i,1:250);
+    while 1
+        pulso = pulsos(i,(x-1)*250+1:250*x);
+        if max(abs(pulso))<=5*pp/100*myiPeak(i)
+            x = x + 1;
+        else
+            break;
+        end
+    end
     pulso = resample(pulso,r,1);
     n = 1:size(pulso,2);
     
     % Média móvel
-    k = 8/100*size(pulso,2);
+    k = kk/100*size(pulso,2);
     pulso_mm = conv(pulso,ones(1,k)/k,'same');
     derivada = diff(pulso_mm);
     derivada = [0 derivada];
-    condicao = ((abs(derivada)<=1/100*max(abs(derivada))) & (abs(pulso_mm)>=20/100*max(abs(pulso_mm)))); 
+    condicao = ((abs(derivada)<=1/100*max(abs(derivada))) & (abs(pulso_mm)>=pp/100*myiPeak(i))); 
     s = pulso_mm(condicao);
     myiPeak(i) = s(1)/abs(s(1)) * myiPeak(i);
 end
@@ -49,11 +60,15 @@ save("myiPeak")
 [v,naocoincidem,i_erros] = log_v(myiPeak,iPeak);
 
 % Para testar
-close all;
+% close all;
 fh = figure;
 fh.WindowState = 'maximized';
 for sub=1:9
     i=i_erros(sub);
     subplot(3,3,sub);
-    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,5,15,"~");
+    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,"~");
+%     plot_pulso_erro(i,pulsos,iPeak,"~");
 end 
+plot_pulso_erro(550,pulsos,iPeak,1);
+plot_pulso_erro(286,pulsos,iPeak,1);
+plot_pulso_derivada_erro(286,pulsos,myiPeak,iPeak,2,pp,1);

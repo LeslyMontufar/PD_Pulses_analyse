@@ -1,6 +1,7 @@
 function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,sub)
     myiPeak_ = abs(myiPeak(i));
-    pulso = pulsos(i,1:250);
+    
+    pulso = pulsos(i,:);
     pulso = resample(pulso,100,1);
     n = 1:size(pulso,2);
     
@@ -15,7 +16,7 @@ function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,kk,pp,sub)
     myiPeak_ = s(1)/abs(s(1)) * myiPeak_;
     
     % Gráfico
-    if sub ~= "~"
+    if sub ~= 0
         fh = figure;
         fh.WindowState = 'maximized';
     end
