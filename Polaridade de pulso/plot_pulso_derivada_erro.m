@@ -5,8 +5,7 @@ function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,sub,mostrar_der
     else
         pulso = pulsos(i,:);
     end
-    pulso2 = resample(pulso,r,1);
-%     pulso = (pulso<0.0046)*pulso+(pulso>=0.0046)*pulso2;
+    pulso = resample(pulso,r,1);
     n = 1:size(pulso,2);
     
     % Média móvel

@@ -1,5 +1,5 @@
 clc;
-% close all; 
+close all; 
 clearvars;
 load('dadosLesly.mat');
 
@@ -7,22 +7,70 @@ myiPeak = ones(length(iPeak),1);
 if ~verifica_picos(myiPeak,iPeak,pulsos); return; end
 
 % ---- Determinando se a primeira oscilação é um mínimo ou máximo local ----
-err_eq = 0.0046;
-i = 51;
-r = 30;
-kk = .8;
-pp = 15;
-pulso = pulsos(i,:);
-pulso = pulso.*(abs(pulso)<err_eq);
-figure;
-plot(pulso);
-% hold on;
-% pulso = resample(pulso,r,1);
-% ipulso = 1:1/r:size(pulso,2)/r+1-1/r;
-% plot(ipulso,pulso);
-% plot_pulso_derivada_erro(i,pulso,myiPeak,iPeak,r,kk,pp,0,0);
+err_eq = 0.0045;
+% i = 51;
+% r = 30;
+% kk = .8;
+% pp = 15;
+% pulso = pulsos(i,:);
+% ipulso2 = 1:1/r:size(pulso,2)+1-1/r;
+% pulso2 = spline(1:size(pulso,2),pulso,ipulso2);
+ 
 
-return;
+% figure;
+% plot(pulso);
+% hold on;
+% plot(ipulso2,pulso2);
+% line ([size(pulso,2) 0], [iPeak(i,1) iPeak(i,1)], "linestyle", "-", "color", "g");
+% 
+% ipulso3 = 1:1/r:size(pulso,2)+1-1/r;
+% pulso3 = resample(pulso,r,1);
+% plot(ipulso3,pulso3);
+
+% metodo
+% sub = 0;
+% myiPeak_ = abs(myiPeak(i));
+% n = 1:size(pulso,2);
+% k = floor(kk/100*size(pulso,2));
+% pulso_mm = conv(pulso,ones(1,k)/k,'same');
+% derivada = diff(pulso_mm);
+% derivada = [0 derivada];
+% 
+% ider = 1:1/r:size(derivada,2)+1-1/r;
+% der = spline(1:size(derivada,2),derivada,ider);
+% der0 = round(ider(abs(der)<=1/100*max(abs(der))));
+% [~,der0] = findgroups(der0);
+% 
+% s = pulso_mm(der0);
+% n = n(der0);
+% 
+% condicao = (abs(pulso_mm(der0))>=.4*err_eq);%pp/100*max(abs(pulso_mm(der0)))); 
+% s = s(condicao);
+% n = n(condicao);
+% myiPeak_ = s(1)/abs(s(1)) * myiPeak_;
+% 
+% if sub == 0
+%     fh = figure;
+%     fh.WindowState = 'maximized';
+% end
+% plot(pulso);
+% hold on;
+% plot(pulso_mm);
+% line ([size(pulso,2) 0], [iPeak(i,1) iPeak(i,1)], "linestyle", "-", "color", "g"); 
+% scatter(n,s,'r','filled');
+% 
+% plot(.05*max(abs(pulso))/max(abs(derivada))*derivada);
+% 
+% v_err = abs((myiPeak_-iPeak(i,1))/iPeak(i,1)*100);
+% title([i,myiPeak_,iPeak(i,1), v_err]);
+% xlim([0 size(pulso,2)]);
+% if sub == 0
+%     legend("original","mm","derivada");
+% end
+
+% return;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % plot_pulso_derivada_erro(2,pulsos,myiPeak,iPeak);
 
 % Dado: 0.0045 é o passo em y, é erro mínimo do equipamento
