@@ -1,32 +1,28 @@
-clc;close all; clearvars;
+clc;
+% close all; 
+clearvars;
 load('dadosLesly.mat');
 
-% plot_pulsos_iPeak(1);
-
-err_per = 0.1; % erro de aproximadamente 0.1%
-myiPeak = zeros(length(iPeak),1);
-cnt = 0;
-for i=1:size(pulsos,1)
-    myiPeak(i) = max(abs(pulsos(i,:)));
-    if myiPeak(i)-abs(iPeak(i))> err_per/100*abs(iPeak(i))
-        fprintf("%d: %d %d\n",i,myiPeak(i),abs(iPeak(i)))
-        cnt=cnt+1;
-    end
-end
-coincidiram = size(pulsos,1)-cnt;
-
-% pulso com uma oscilação gigante no final
-i = 4158;
-myiPeak(i) = max(abs(pulsos(i,1:end-5)));
-if myiPeak(i)-abs(iPeak(i))<= err_per/100*abs(iPeak(i))
-    coincidiram = coincidiram + 1;
-%     fprintf("%d: %d %d",i,myiPeak(i),abs(iPeak(i)))
-%     fprintf(" -> sucesso\n");
-else
-    return
-end
+myiPeak = ones(length(iPeak),1);
+if ~verifica_picos(myiPeak,iPeak,pulsos); return; end
 
 % ---- Determinando se a primeira oscilação é um mínimo ou máximo local ----
+err_eq = 0.0046;
+i = 51;
+r = 30;
+kk = .8;
+pp = 15;
+pulso = pulsos(i,:);
+pulso = pulso.*(abs(pulso)<err_eq);
+figure;
+plot(pulso);
+% hold on;
+% pulso = resample(pulso,r,1);
+% ipulso = 1:1/r:size(pulso,2)/r+1-1/r;
+% plot(ipulso,pulso);
+% plot_pulso_derivada_erro(i,pulso,myiPeak,iPeak,r,kk,pp,0,0);
+
+return;
 % plot_pulso_derivada_erro(2,pulsos,myiPeak,iPeak);
 
 % Dado: 0.0045 é o passo em y, é erro mínimo do equipamento
@@ -67,6 +63,7 @@ for sub=1:9
     plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,1,0);
 %     plot_pulso_erro(i,pulsos,iPeak,"~");
 end 
+
 % plot_pulso_erro(550,pulsos,iPeak,0);
 % plot_pulso_erro(286,pulsos,iPeak,0);
 % plot_pulso_derivada_erro(552,pulsos,myiPeak,iPeak,kk,pp,0);
