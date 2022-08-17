@@ -47,10 +47,22 @@ fh.WindowState = 'maximized';
 for sub=1:9
     i=i_erros(sub);
     subplot(3,3,sub);
-    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,1,0);
+    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,1,1);
 end 
 
 figure;
 plot(iPeak(i_erros));
+
+% Com alta amplitude
+
+i_erros_alto = i_erros([41,64,72]);
+fh = figure;
+fh.WindowState = 'maximized';
+for sub=1:3
+    i=i_erros_alto(sub);
+    subplot(3,1,sub);
+    plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,1,1);
+end 
+
 
 fprintf("\nNão coincidem: %d\n\n",numel(i_erros));

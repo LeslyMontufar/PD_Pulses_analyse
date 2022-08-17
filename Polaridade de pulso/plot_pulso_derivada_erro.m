@@ -33,7 +33,9 @@ function plot_pulso_derivada_erro(i,pulsos,myiPeak,iPeak,r,kk,pp,sub,mostrar_der
         yyaxis right
         plot(derivada);
     end
-    v_err = abs((myiPeak_-iPeak(i,1))/iPeak(i,1)*100);
+%     v_err = abs((myiPeak_-iPeak(i,1))/iPeak(i,1)*100);
+    iPolaridade = iPeak(i,1)/abs(iPeak(i,1));
+    v_err = (myiPeak_~=iPolaridade)*100;
     title([i,myiPeak_,iPeak(i,1), v_err]);
     xlim([0 size(pulso,2)]);
     if sub == 0
