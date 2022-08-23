@@ -2,6 +2,7 @@ clc;close all; clearvars;
 load('dadosLesly.mat');
 
 myiPeak = ones(length(iPeak),1);
+iPolaridade = iPeak./abs(iPeak);
 
 % ---- Determinando se a primeira oscilação é um mínimo ou máximo local ----
 
@@ -15,6 +16,7 @@ pp = 15;
 k = floor(kk/100*size(pulsos,2)*r);
 derivada = zeros(1,size(pulsos,2)*r);
 n = 1:size(pulsos,2)*r;
+
 for i=1:size(pulsos,1)
     pulso = pulsos(i,:);
     pulso = resample(pulso,r,1);
@@ -30,7 +32,6 @@ for i=1:size(pulsos,1)
         ss(end+1) = s(1);
     end
 end
-iPolaridade = iPeak./abs(iPeak);
 v_erros = (myiPeak(:)~=iPolaridade)*100;
 v = [myiPeak(:),iPolaridade(:), v_erros];
 n = 1:size(iPolaridade,1);
