@@ -1,7 +1,7 @@
-function plot_pulsos_iPeak(x)
+function plot_pulsos_iPeak(x,pulsos,iPeak)
     fh = figure;
     fh.WindowState = 'maximized';
-    for i=25*(x-1)+1:25*x%size(pulsos,1)
+    for i=25*(x-1)+1:25*x %size(pulsos,1)
         subplot(5,5,i-25*(x-1));
         plot(pulsos(i,:));
         hold on;
