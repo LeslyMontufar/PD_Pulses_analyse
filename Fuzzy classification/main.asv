@@ -82,17 +82,14 @@ fprintf("T: %d\n",sigmaT);
 fprintf("W: %d\n",sigmaF);
 fprintf("Energia do pulso original: %d\n", energia(pulso_original,1,t_end));
 fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso,ti,t0))
-fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso_fft_abs,freqs,f0))
-fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso_fft_abs,freqs,sigmaF))
-
+energia_div(pulso_fft_abs,freqs,f0)
 end
 
 function e = energia_div(y,x,x0)
     x0 = x0/(x(2)-x(1));
     e1 = energia(y,1,x0);
     e2 = energia(y,x0,numel(x));
-    etot = energia(y,1,numel(x));
-    e = [e1 e2]/etot*100;
+    e = [e1 e2];
 end
 
 function e = energia(y,xinit,xend)
