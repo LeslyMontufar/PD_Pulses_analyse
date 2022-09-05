@@ -17,14 +17,14 @@ Ts = ti(2)-ti(1);
 t_end = ti(end);
 t0 = centroide(ti,pulso,0.5);
 
-etot = 99;
+etot = 97;
 te = segmenta_e(etot,pulso,ti);
 
 
 
 fh = figure(1);
-% fh.Position(1:2) = [1000 300];
-fh.WindowState = 'maximized';
+fh.Position(1:2) = [1000 300];
+% fh.WindowState = 'maximized';
 plot(pulso);
 line_v(te(1,1),"m",pulso); % tstart
 line_v(te(1,2),"c",pulso); % t0
@@ -33,6 +33,8 @@ line_v(te(1,3),"m",pulso); % tstop
 title(te(2,:));
 ylabel("Corrente");
 xlabel("Tempo/Amostras");
+
+fprintf("\n")
 
 fprintf("tstart: %d\n",te(1,1));
 fprintf("t0: %d\n",te(1,2));
@@ -52,14 +54,22 @@ function te = segmenta_e(etot,y,x)
     tstop = t0_c;
     
     e = 0;
-    while e*100 < etot*99/100
+    e1 = 0;
+    e2 = 0;
+    e1_init = energia(y,1,t0_c);
+    e2_init = energia(y,t0_c,x(end));
+    etot_init = e1_init + e2_init;
+    fprintf("%g + %g = %g\n\n",e1_init,e2_init,etot_init)
+    while (e1/etot_init < e1_init*etot/100)
         tstart = floor(centroide(x(1:tstart),y(1:tstart),0.5));
-        tstop = ceil(centroide(x(tstop:end),y(tstop:end),0.5));
-        e = energia(y,tstart,tstop);
-        fprintf("tstart: %.4g\t\t e: %.4g\n",tstart,e);
+        if (e2/etot_init < e2_init*etot/100)
+            tstop = ceil(centroide(x(tstop:end),y(tstop:end),0.5));
+        end
+        e1 = energia(y,tstart,t0_c);
+        e2 = energia(y,t0_c,tstop);
+        e = e1+e2;
+        fprintf(":: %g %g\t\t e: %.4g + %.4g = %.4g >= %.4g + %.4g\n",tstart,tstop,e1/etot_init,e2/etot_init,e,e1_init*etot/100,e2_init*etot/100);
     end
-    e1 = energia(y,tstart,t0_c);
-    e2 = energia(y,t0_c,tstop);
     te = [tstart, t0, tstop;e1,e2,e];
 end
 function e = energia_div(y,x,x0)
