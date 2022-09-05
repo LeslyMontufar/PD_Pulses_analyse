@@ -17,50 +17,45 @@ Ts = ti(2)-ti(1);
 t_end = ti(end);
 t0 = centroide(ti,pulso,0.5);
 
-etot = 99;
-te = segmenta_e(etot,pulso,ti);
+etot = 75;
+[tstart, tstop,e1,e2] = segmenta_e(etot,pulso,ti);
 
 
 
-fh = figure(1);
-% fh.Position(1:2) = [1000 300];
-fh.WindowState = 'maximized';
+fh = figure(2);
+fh.Position(1:2) = [1000 300];
 plot(pulso);
-line_v(te(1,1),"m",pulso); % tstart
-line_v(te(1,2),"c",pulso); % t0
-line_v(te(1,3),"m",pulso); % tstop
+line_v(t0,"c",pulso);
 
-title(te(2,:));
+
+teste = centroide(new_t,pulso,0.5);
+line_v(teste,"m",pulso);
+fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso,ti,teste))
+
+title(energia_div(pulso,ti,t0));
 ylabel("Corrente");
 xlabel("Tempo/Amostras");
 
-fprintf("tstart: %d\n",te(1,1));
-fprintf("t0: %d\n",te(1,2));
-fprintf("tstop: %d\n",te(1,3));
+fprintf("teste: %d\n",teste);
+fprintf("t0: %d\n",t0);
 
 fprintf("\n")
 
 fprintf("Energia do pulso original: %d\n", energia(pulso_original,1,t_end));
-fprintf("Energia do pulso: %d\n", energia(pulso,1,t_end));
-fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso,ti,t0));
-fprintf("e: %d\n",te(2,3));
+fprintf("Divisão da energia: %.4g e %.4g\n",energia_div(pulso,ti,t0))
 
-function te = segmenta_e(etot,y,x)
+function t = segmenta_e(etot,y,x)
     t0 = centroide(x,y,0.5);
-    t0_c = ceil(t0);
-    tstart = t0_c;
-    tstop = t0_c;
-    
-    e = 0;
-    while e*100 < etot*99/100
-        tstart = floor(centroide(x(1:tstart),y(1:tstart),0.5));
-        tstop = ceil(centroide(x(tstop:end),y(tstop:end),0.5));
+    tstart = t0_c = ceil(t0);
+    while e < etot*0.01/100
+        
+        tstart = centroide(x(1:tstart),y(1:t0_c),0.5);
+        tstop = centroide(x(t0_c:end),y(t0_c:end),0.5);
         e = energia(y,tstart,tstop);
-        fprintf("tstart: %.4g\t\t e: %.4g\n",tstart,e);
+        fprintf("e: %.4g",e);
     end
-    e1 = energia(y,tstart,t0_c);
-    e2 = energia(y,t0_c,tstop);
-    te = [tstart, t0, tstop;e1,e2,e];
+    e1 = energia
+    t = [tstart, t0, tstop;e1,e2,0];
 end
 function e = energia_div(y,x,x0)
     x0 = x0/(x(2)-x(1));
